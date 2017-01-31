@@ -9,6 +9,7 @@
         <properties>
             <property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>
             <property name="hibernate.ogm.neo4j.database_path" value="C:\Users\edkan\Documents\Neo4j\fb.graphdb" />
+            <!--property name="hibernate.ogm.neo4j.database_path" value="C:\Users\edkan\Documents\Neo4j\jy.graphdb" /-->
             <property name="hibernate.search.default.directory_provider" value="ram" />
         </properties>
     </persistence-unit>
@@ -18,6 +19,7 @@
         <properties>
             <property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>
             <property name="hibernate.ogm.neo4j.database_path" value="C:\Users\edkan\Documents\Neo4j\fb.graphdb" />
+            <!--property name="hibernate.ogm.neo4j.database_path" value="C:\Users\edkan\Documents\Neo4j\jy.graphdb" /-->
             <property name="hibernate.search.default.directory_provider" value="ram" />
         </properties>
     </persistence-unit>

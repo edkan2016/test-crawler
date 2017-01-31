@@ -7,37 +7,35 @@ import javax.persistence.*;
 public class User {
 
     public User(){}
-    public User(String href) {
-    	this.href = href;
+    public User(String sHREF, String sName) {
+    	href = sHREF;
+    	name = sName;
     }
         
     @Id
     @Column(name = "href", unique = true)
     private String href;
     
-    @OneToMany(cascade=CascadeType.MERGE)
-    private List<ShareRelation> TL_SHARE = new ArrayList<>();
-        
-    @OneToMany(cascade=CascadeType.MERGE)
-    private List<CommentRelation> COMMENT = new ArrayList<>();
+    private String name;
     
-    String getHref() { return href; }
-    public List<ShareRelation> getShareRelations() {
-		return TL_SHARE;
-	}
-	public void addShareRelation(ShareRelation shareRelation) {
+    @OneToMany
+    private Set<ShareRelation> TL_SHARE = new HashSet<>();
+        
+	@OneToMany
+    private Set<CommentRelation> COMMENT = new HashSet<>();
+    
+    public String getHref() { return href; }
+    public String getName() { return name; }
+    
+	void addShareRelation(ShareRelation shareRelation) {
 		TL_SHARE.add(shareRelation);
 	}
-	public List<CommentRelation> getCommentRelations() {
-		return COMMENT;
-	}
-	public User addCommentRelation(CommentRelation commentRelation) {
+	void addCommentRelation(CommentRelation commentRelation) {
 		COMMENT.add(commentRelation);
-		return this;
 	}
 	@Override
 	public String toString() {
-		return "{"+href+": CommentRelations:"+COMMENT+" ShareRelations:"+TL_SHARE+"}";
+		return name+"{"+href+"(C"+COMMENT.size()+"S"+TL_SHARE.size()+")}";//+super.toString();
 	}
 	@Override
 	public int hashCode() {
@@ -63,12 +61,21 @@ public class User {
 		return true;
 	}
 
-	public static User getUser(EntityManager em, String sHREF) {
+	public static User getUser(EntityManager em, String sHREF, String sName) {
+		User user;
 		String sQuery = "MATCH (u:User{href:'"+sHREF+"'}) RETURN u";
 		try {
-			return (User) em.createNativeQuery( sQuery, User.class ).getSingleResult();
+			user = (User) em.createNativeQuery(sQuery, User.class).getSingleResult();
+			if (sName!=null && !sName.isEmpty() &&
+				!user.name.equals(sName) && user.name.equals(user.href)) {
+				user.name = sName;
+				em.merge(user);
+			}
 		} catch (NoResultException ex) {
-			return new User(sHREF);
+			user = new User(sHREF, sName==null||sName.isEmpty()?sHREF:sName);
+			em.persist(user);
 		}
+		
+		return user;
 	}
 }

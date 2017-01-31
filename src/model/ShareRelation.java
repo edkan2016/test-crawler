@@ -3,26 +3,39 @@ package model;
 import javax.persistence.*;
 
 @Entity
-class ShareRelation extends Relation {
+public class ShareRelation extends Relation {
 	
-	@ManyToOne(cascade=CascadeType.MERGE)
+	@ManyToOne
 	private User SHARE;
 	
-	public User getOriginalPoster() {
-		return SHARE;
-	}
-
-	public void setOriginalPoster(User poster) {
-		SHARE = poster;
-	}
-
 	private ShareRelation() {}
-	public ShareRelation(User poster) {
-		setOriginalPoster(poster);
+	private ShareRelation(User poster) {
+		SHARE = poster;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString()+"->"+SHARE;
+		return super.toString()+"Sharing "+SHARE;
+	}
+	
+	public static ShareRelation getShareRelation(EntityManager em, User timelineUser, User poster) {
+		String sQuery = "MATCH (:User{href:'"+timelineUser.getHref()+"'})"
+								+ "-[:TL_SHARE]->(r:Relation)-[:SHARE]->"
+								+ "(:User{href:'"+poster.getHref()+"'})"
+					  + "RETURN r";
+		
+		ShareRelation relation;
+		try {
+			relation = (ShareRelation) retrieveRelation(em, sQuery, ShareRelation.class);
+//			System.out.println("Existing share relation "+relation.pk);
+		} catch (NoResultException ex) {
+			relation = new ShareRelation(poster);
+			em.persist(relation);
+//			System.out.println("New share relation "+relation.pk);			
+			timelineUser.addShareRelation(relation);
+			em.merge(timelineUser);
+		}
+		
+		return relation;
 	}
 }

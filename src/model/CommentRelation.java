@@ -1,12 +1,11 @@
 package model;
 
 import javax.persistence.*;
-import crawler.FBCrawler;
 
 @Entity
 public class CommentRelation extends Relation {		
 
-	@ManyToOne(cascade=CascadeType.MERGE)
+	@ManyToOne
 	private User TL_COMMENT;
 	
 	private CommentRelation() {}
@@ -16,26 +15,26 @@ public class CommentRelation extends Relation {
 	
 	@Override
 	public String toString() {
-		return super.toString()+"->"+TL_COMMENT;
+		return super.toString()+"Timeline of "+TL_COMMENT;
 	}
 	
-	public static CommentRelation getCommentRelation(EntityManager em, 
-			User timelineUser, String sCommentorHref) {
+	public static CommentRelation getCommentRelation(EntityManager em, User timelineUser, User commentor) {
 		String sQuery = "MATCH (:User{href:'"+timelineUser.getHref()+"'})"
 								+ "<-[:TL_COMMENT]-(r:Relation)<-[:COMMENT]-"
-								+ "(c:User{href:'"+sCommentorHref+"'})"
+								+ "(:User{href:'"+commentor.getHref()+"'})"
 					  + "RETURN r";
 		
 		CommentRelation relation;
 		try {
-			relation = (CommentRelation) em.createNativeQuery(sQuery, CommentRelation.class).getSingleResult();
-			relation.incrementCrawl();
-			relation.incrementCount();
-			relation.updateLastTime();
+			relation = (CommentRelation) retrieveRelation(em, sQuery, CommentRelation.class);
+//			System.out.println("Existing comment relation "+relation.pk);
 		} catch (NoResultException ex) {
 			relation = new CommentRelation(timelineUser);
+			em.persist(relation);
+//			System.out.println("New comment relation "+relation.pk);
+			commentor.addCommentRelation(relation);
+			em.merge(commentor);
 		}
-		
 		return relation;
 	}
 }

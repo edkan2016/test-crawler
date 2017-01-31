@@ -8,18 +8,18 @@ import crawler.FBCrawler;
 public abstract class Relation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long pk;
+    Long pk;
 
-    private String last_time = FBCrawler.sCRAWL_TIME;
+	private String last_time = FBCrawler.sCRAWL_TIME;
     private int count=1, crawl=1;
     private float avg_count = 1;
     
-    void updateLastTime() { last_time = FBCrawler.sCRAWL_TIME; }
+    private void updateLastTime() { last_time = FBCrawler.sCRAWL_TIME; }
 	public void incrementCount() { 
 		count++;
 		updateAvg();
 	}
-	void incrementCrawl() { 
+	private void incrementCrawl() { 
 		crawl++;
 		updateAvg();
 	}
@@ -27,6 +27,15 @@ public abstract class Relation {
 	
 	@Override
 	public String toString() {
-		return "{"+last_time+"/"+count+"/"+crawl+"/"+avg_count+"}";
+		return getClass().getSimpleName()+" PKCntCrwAvg:{"+pk+"/"+last_time+"/"+count+"/"+crawl+"/"+avg_count+"} ";
+	}
+
+	static Relation retrieveRelation(EntityManager em, String sQuery, Class<? extends Relation> castClass) {
+		Relation relation = (Relation) em.createNativeQuery(sQuery, castClass).getSingleResult();
+		relation.incrementCrawl();
+		relation.incrementCount();
+		relation.updateLastTime();
+		em.merge(relation);
+		return relation;
 	}
 }
