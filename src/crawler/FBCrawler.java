@@ -4,15 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 import model.CommentRelation;
@@ -25,7 +19,7 @@ public class FBCrawler {
 	
 	public static void main(String[] args) throws Exception {
 		System.setProperty("webdriver.gecko.driver",
-				"C:\\Users\\edkan\\Documents\\facebook_collect\\geckodriver.exe");
+				"C:\\Users\\edkan\\OneDrive - connect.hku.hk\\programming\\geckodriver.exe");
 		
 		WebDriver driver = new FirefoxDriver();
 		
