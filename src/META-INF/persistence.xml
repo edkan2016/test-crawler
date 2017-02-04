@@ -6,7 +6,7 @@
 
     <persistence-unit name="ogm-neo4j" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>
-        <properties>
+        <properties> 
             <property name="hibernate.ogm.datastore.provider" value="neo4j_embedded"/>
             <property name="hibernate.ogm.neo4j.database_path" value="C:\Users\edkan\Documents\Neo4j\fb.graphdb" />
             <!--property name="hibernate.ogm.neo4j.database_path" value="C:\Users\edkan\Documents\Neo4j\jy.graphdb" /-->
